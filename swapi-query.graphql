@@ -1,0 +1,25 @@
+query {
+  person(personID: 5) {
+    name
+    birthYear
+    created
+    filmConnection {
+      films {
+        title
+      }
+    }
+  }
+}
+
+query {
+  person(personID: 1) {
+    name
+    height
+    mass
+    filmConnection {
+      films {
+        title
+      }
+    }
+  }
+}
