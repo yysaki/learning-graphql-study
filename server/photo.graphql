@@ -1,33 +1,19 @@
-query {
-	totalPhotos
-}
-
 mutation {
-  postPhoto(name: "sample photo")
-}
-
-mutation($name: String!, $description: String) {
-  postPhoto(name: $name, description: $description)
-}
-
-{
-  "name": "sample photo A",
-  "description": "A sample photo for our dataset"
-}
-
-mutation($name: String!, $description: String) {
-  postPhoto(name: $name, description: $description) {
-    id
-    name
-    description
+  githubAuth(code: "<MY-CODE>") {
+    token
+    user {
+      githubLogin
+      name
+      avatar
+    }
   }
 }
 
-query listPhotos {
-  allPhotos {
-    id
+query currentUser {
+  me {
+    githubLogin
     name
-    description
+    avatar
   }
 }
 
@@ -35,8 +21,10 @@ mutation($input: PostPhotoInput!) {
   postPhoto(input: $input) {
     id
     name
-    description
-    category
+    postedBy {
+      name
+      avatar
+    }
   }
 }
 
@@ -44,5 +32,31 @@ mutation($input: PostPhotoInput!) {
   "input": {
 	  "name": "sample photo A",
   	"description": "A sample photo for our dataset"
+  }
+}
+
+
+mutation {
+  addFakeUsers(count: 3) {
+    name
+    githubLogin
+  }
+}
+
+mutation {
+  fakeUserAuth(githubLogin: "silversnake459") {
+    token
+  }
+}
+
+query {
+  totalPhotos
+}
+
+query listPhotos {
+  allPhotos {
+    id
+    name
+    description
   }
 }
