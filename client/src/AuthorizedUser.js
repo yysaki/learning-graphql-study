@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Query, Mutation } from 'react-apollo';
+import { Query, Mutation, withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
+import { compose } from 'recompose';
 import { ROOT_QUERY } from './App'
 
 const GITHUB_AUTH_MUTATION = gql`
@@ -11,7 +12,7 @@ const GITHUB_AUTH_MUTATION = gql`
 `
 
 const Me = ({ logout, requestCode, signingIn }) =>
-  <Query query={ ROOT_QUERY }>
+  <Query query={ ROOT_QUERY } fetchPolicy="cache-only">
     {
       ({ loading, data }) => data && data.me ?
       <CurrentUser { ...data.me } logout={ logout } /> :
@@ -50,6 +51,13 @@ class AuthorizedUser extends Component {
     }
   }
 
+  logout = () => {
+    localStorage.removeItem('token')
+    let data = this.props.client.readQuery({ query: ROOT_QUERY })
+    data.me = null
+    this.props.client.writeQuery({ query: ROOT_QUERY, data })
+  }
+
   requestCode() {
     var clientID = process.env.REACT_APP_CLIENT_ID
     window.location = `http://github.com/login/oauth/authorize?client_id=${ clientID }&scope=user`
@@ -66,7 +74,7 @@ class AuthorizedUser extends Component {
           return (
             <Me signingIn={ this.state.signingIn }
               requestCode={ this.requestCode }
-              logout={ () => localStorage.removeItem('token') } />
+              logout={ this.logout } />
           )
         }}
 
@@ -75,4 +83,4 @@ class AuthorizedUser extends Component {
   }
 }
 
-export default withRouter(AuthorizedUser)
+export default compose(withApollo, withRouter)(AuthorizedUser)
